@@ -1,98 +1,161 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { useEffect, useState } from "react";
+import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import { IntervalSetup } from "@/components/interval/interval-setup";
+import { TimerDisplay } from "@/components/interval/timer-display";
+import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
+import { IconSymbol } from "@/components/ui/icon-symbol";
+import { Colors } from "@/constants/theme";
+import { useIntervalContext } from "@/contexts/interval-context";
+import { useColorScheme } from "@/hooks/use-color-scheme";
+
+type ScreenMode = "empty" | "setup" | "timer";
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const colorScheme = useColorScheme();
+  const tintColor = Colors[colorScheme ?? "light"].tint;
+  const { config } = useIntervalContext();
+  const [mode, setMode] = useState<ScreenMode>(config ? "timer" : "empty");
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
+  // 설정이 변경되면 모드 업데이트
+  useEffect(() => {
+    if (config && mode === "setup") {
+      setMode("timer");
+    } else if (!config && mode === "timer") {
+      setMode("empty");
+    }
+  }, [config, mode]);
+
+  const handleStartSetup = () => {
+    setMode("setup");
+  };
+
+  const handleReset = () => {
+    setMode("empty");
+  };
+
+  // 설정 모드
+  if (mode === "setup") {
+    return (
+      <ThemedView style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity
+            onPress={() => setMode(config ? "timer" : "empty")}
+            style={styles.backButton}
+          >
+            <IconSymbol name="chevron.left" size={24} color={tintColor} />
+            <ThemedText style={{ color: tintColor }}>뒤로</ThemedText>
+          </TouchableOpacity>
+        </View>
+        <IntervalSetup />
       </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
+    );
+  }
+
+  // 타이머 모드
+  if (mode === "timer" && config) {
+    return (
+      <ThemedView style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity
+            onPress={() => setMode("setup")}
+            style={styles.settingsButton}
+          >
+            <IconSymbol name="gear" size={24} color={tintColor} />
+          </TouchableOpacity>
+        </View>
+        <TimerDisplay config={config} onReset={handleReset} />
       </ThemedView>
-    </ParallaxScrollView>
+    );
+  }
+
+  // 빈 상태 (설정 없음)
+  return (
+    <ThemedView style={styles.container}>
+      <ScrollView
+        contentContainerStyle={styles.emptyContainer}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.iconContainer}>
+          <IconSymbol
+            name="timer"
+            size={80}
+            color={tintColor}
+            style={{ opacity: 0.5 }}
+          />
+        </View>
+        <ThemedText type="title" style={styles.emptyTitle}>
+          인터벌 타이머
+        </ThemedText>
+        <ThemedText style={styles.emptyDescription}>
+          운동 인터벌을 설정하고{"\n"}효과적인 러닝 트레이닝을 시작하세요
+        </ThemedText>
+        <TouchableOpacity
+          style={[styles.startButton, { backgroundColor: tintColor }]}
+          onPress={handleStartSetup}
+        >
+          <ThemedText style={styles.startButtonText}>
+            설정하고 시작하기
+          </ThemedText>
+        </TouchableOpacity>
+      </ScrollView>
+    </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  container: {
+    flex: 1,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  header: {
+    paddingTop: 60,
+    paddingHorizontal: 20,
+    paddingBottom: 10,
+    flexDirection: "row",
+    alignItems: "center",
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  backButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    padding: 8,
+  },
+  settingsButton: {
+    marginLeft: "auto",
+    padding: 8,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+    paddingTop: 100,
+  },
+  iconContainer: {
+    marginBottom: 30,
+  },
+  emptyTitle: {
+    marginBottom: 16,
+    textAlign: "center",
+  },
+  emptyDescription: {
+    fontSize: 16,
+    textAlign: "center",
+    opacity: 0.7,
+    marginBottom: 40,
+    lineHeight: 24,
+  },
+  startButton: {
+    paddingHorizontal: 32,
+    paddingVertical: 16,
+    borderRadius: 12,
+    minWidth: 200,
+  },
+  startButtonText: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "bold",
+    textAlign: "center",
   },
 });
