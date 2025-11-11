@@ -1,12 +1,11 @@
-import { StyleSheet, TouchableOpacity, View, TextInput } from "react-native";
-import { useState } from "react";
-import { Block, BlockTag, BlockTagLabels } from "@/types/interval";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { IconSymbol } from "@/components/ui/icon-symbol";
-import { useColorScheme } from "@/hooks/use-color-scheme";
 import { Colors } from "@/constants/theme";
-import { BlockTagColors } from "@/types/interval";
+import { useColorScheme } from "@/hooks/use-color-scheme";
+import { Block, BlockTagColors, BlockTagLabels } from "@/types/interval";
+import { useState } from "react";
+import { StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
 
 interface BlockEditorProps {
   block: Block;
@@ -39,8 +38,7 @@ export function BlockEditor({ block, onUpdate, onDelete }: BlockEditorProps) {
   };
 
   const tagColors = BlockTagColors[block.tag];
-  const bgColor =
-    colorScheme === "dark" ? tagColors.dark : tagColors.light;
+  const bgColor = colorScheme === "dark" ? tagColors.dark : tagColors.light;
 
   return (
     <ThemedView style={[styles.container, { backgroundColor: bgColor + "40" }]}>
@@ -90,7 +88,11 @@ export function BlockEditor({ block, onUpdate, onDelete }: BlockEditorProps) {
         <ThemedText style={styles.label}>속력</ThemedText>
         <View style={styles.speedContainer}>
           <TextInput
-            style={[styles.input, styles.speedInput, { borderColor: tintColor }]}
+            style={[
+              styles.input,
+              styles.speedInput,
+              { borderColor: tintColor },
+            ]}
             value={speedKmh}
             onChangeText={(text) => {
               setSpeedKmh(text);
@@ -180,4 +182,3 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
 });
-

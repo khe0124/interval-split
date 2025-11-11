@@ -1,11 +1,17 @@
-import { StyleSheet, TouchableOpacity, View, TextInput, ScrollView } from "react-native";
-import { useState } from "react";
-import { Round, Block, BlockTag } from "@/types/interval";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { IconSymbol } from "@/components/ui/icon-symbol";
-import { useColorScheme } from "@/hooks/use-color-scheme";
 import { Colors } from "@/constants/theme";
+import { useColorScheme } from "@/hooks/use-color-scheme";
+import { Block, BlockTag, Round } from "@/types/interval";
+import { useState } from "react";
+import {
+  ScrollView,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { BlockEditor } from "./block-editor";
 
 interface RoundEditorProps {
@@ -28,9 +34,7 @@ export function RoundEditor({
   const updateBlock = (blockId: string, updatedBlock: Block) => {
     onUpdate({
       ...round,
-      blocks: round.blocks.map((b) =>
-        b.id === blockId ? updatedBlock : b
-      ),
+      blocks: round.blocks.map((b) => (b.id === blockId ? updatedBlock : b)),
     });
   };
 
@@ -87,7 +91,10 @@ export function RoundEditor({
               <TextInput
                 style={[
                   styles.repeatInput,
-                  { borderColor: tintColor, color: Colors[colorScheme ?? "light"].text },
+                  {
+                    borderColor: tintColor,
+                    color: Colors[colorScheme ?? "light"].text,
+                  },
                 ]}
                 value={round.repeatCount.toString()}
                 onChangeText={updateRepeatCount}
@@ -213,4 +220,3 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
 });
-

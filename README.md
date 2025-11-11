@@ -1,50 +1,69 @@
-# Welcome to your Expo app 👋
+# Interval Split 👋
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+## 1. Main 화면
 
-## Get started
+- 시작 버튼
+- 하단 탭 내비게이션
 
-1. Install dependencies
+## 2. 기능 명세
 
-   ```bash
-   npm install
-   ```
+   IntervalBlock {
+      tag: 'warmUp' | 'workOut' | 'coolDown'
+      time: number,
+      pace: number,
+   }
 
-2. Start the app
+### 2-1 데이터 정의
 
-   ```bash
-   npx expo start
-   ```
+   인터벌 세트(IntervalSet)
+      IntervalSet {
+         warmUp: IntervalBlock
+         workOut: IntervalBlock[]
+         coolDown: IntervalBlock
+      }
+      - tag, time, pace
+      - 시작(warming up)
+         - 워밍업의 횟수는 1회이다
+         - tag, time
+      - 프로그램
+         - 프로그램의 횟수는 제한이 없다 (workOut field에서 배열의 갯수 추가 계속 할 수 있음)
+         - tag, time, round
+      - 쿨다운
+         - 쿨다운의 횟수는 1회이다.
+         - tag, time
+      시나리오
+      1. 최초 생성 시 IntervalSet로 생성
+      2. UI에서 시작과 쿨다운은 tag 수정 불가능
+      3. 프로그램 라벨 옆에는 + 버튼이 있어서 Block 추가 가능
+      4. 저장하면 AsyncStorage에 저장
+   인터벌 프로그램(IVProgram)
+      프로그램의 템플릿
+      IVProgram {
+         workOuts: IntervalSet[],
+         startDate: Date,
+         endDate: Date,
+         period: number,
+      }
+      미리 제공하는 프로그램
+         - 초보 (1달 세션)
+         - 중간 (2주 세션)
+      자율 등록
 
-In the output, you'll find options to open the app in a
+### 2-2 화면 정의
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+2-2-1 메인
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+- 로고
+- 시작하기(Run)
+- 프로그램(프로그램 만들기 & 수정하기)
 
-## Get a fresh project
+2-2-2 프로그램 짜기
 
-When you're ready, run:
+- 시작 설정
+- workout 설정
+- cool down 설정
 
-```bash
-npm run reset-project
-```
+2-2-3 인터벌 프로그램
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- 초보(1달) -> JSON으로 미리 Sheet 작성
+- 중수(1달) -> JSON으로 미리 Sheet 작성
